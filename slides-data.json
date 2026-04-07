@@ -1,0 +1,277 @@
+{
+  "meta": {
+    "title": "Google AI Studio로 MVP 앱 빌드 & 배포",
+    "subtitle": "기업 실무자를 위한 단계별 실습 가이드",
+    "author": "FLOW~ : AX Design Lab",
+    "date": "2026",
+    "totalSlides": 8,
+    "theme": {
+      "primaryColor": "#1B2A4A",
+      "accentColor": "#FF6B35",
+      "backgroundColor": "#FFFFFF",
+      "textColor": "#333333"
+    }
+  },
+  "slides": [
+    {
+      "id": 1,
+      "type": "cover",
+      "title": "Google AI Studio로\nMVP 앱 빌드 & 배포",
+      "subtitle": "기업 실무자를 위한 단계별 실습 가이드",
+      "description": "프롬프트 설계 → 앱 빌딩 → Firebase → Google 로그인 → Vercel 배포",
+      "image": {
+        "placeholder": true,
+        "description": "Google AI Studio 메인 화면 스크린샷 또는 완성된 앱 화면",
+        "alt": "커버 이미지"
+      },
+      "keyPoints": [],
+      "notes": "발표 시작 전 참석자들에게 Google 계정 준비 여부 확인"
+    },
+    {
+      "id": 2,
+      "type": "content",
+      "step": 0,
+      "stepLabel": "준비",
+      "title": "준비물 체크리스트",
+      "subtitle": "시작 전 5분만 확인하세요",
+      "keyPoints": [
+        {
+          "icon": "✅",
+          "title": "필수 계정",
+          "body": "Google 계정 (Gmail) · GitHub 계정 · Vercel 계정 (GitHub 연동)"
+        },
+        {
+          "icon": "💻",
+          "title": "필수 설치",
+          "body": "Node.js 18+ · VS Code · Git — 터미널에서 node -v 로 확인"
+        },
+        {
+          "icon": "🆓",
+          "title": "모두 무료",
+          "body": "Google AI Studio API 키 · Firebase (Spark 플랜) · Vercel (Hobby 플랜)"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "Node.js 설치 확인 터미널 화면 (node -v 출력)",
+        "alt": "터미널 화면"
+      },
+      "callout": {
+        "type": "warning",
+        "text": "Node.js가 없으면 앱 실행 불가 — 지금 바로 nodejs.org에서 다운로드"
+      },
+      "notes": "참석자 중 Node.js 미설치자 있으면 먼저 설치 진행 후 계속"
+    },
+    {
+      "id": 3,
+      "type": "content",
+      "step": 1,
+      "stepLabel": "Step 1",
+      "title": "Google AI Studio\n프롬프트 설계",
+      "subtitle": "AI에게 명확한 역할을 부여하는 법",
+      "keyPoints": [
+        {
+          "icon": "🔑",
+          "title": "API 키 발급",
+          "body": "aistudio.google.com → 'Get API key' → 새 키 생성 → .env 파일에 저장"
+        },
+        {
+          "icon": "📝",
+          "title": "System Prompt 4요소",
+          "body": "# 역할 (무엇을 하는 AI인가) · # 기능 · # 출력 형식 (JSON 권장) · # 제약 조건"
+        },
+        {
+          "icon": "🧪",
+          "title": "테스트 & 반복",
+          "body": "Run → 결과 확인 → 프롬프트 수정 → 만족할 때까지 반복 후 'Get code' 클릭"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "Google AI Studio System Prompt 입력 화면",
+        "alt": "AI Studio 프롬프트 화면"
+      },
+      "codeSnippet": {
+        "language": "text",
+        "label": "System Prompt 템플릿",
+        "code": "# 역할\n당신은 회의록 분석 전문가입니다.\n\n# 기능\n- 회의록을 받아 핵심 내용 추출\n- 결정사항과 액션아이템 분리\n\n# 출력 형식\n{\"summary\": \"...\", \"decisions\": [...], \"actions\": [...]}\n\n# 제약 조건\n- JSON 형식으로만 응답\n- 한국어로 출력"
+      },
+      "notes": "System Prompt가 AI 앱 품질의 80%를 결정함. 충분히 시간 투자할 것"
+    },
+    {
+      "id": 4,
+      "type": "content",
+      "step": 2,
+      "stepLabel": "Step 2",
+      "title": "AI로 앱 코드 생성\n& 로컬 실행",
+      "subtitle": "코딩 없이 React 앱 만들기",
+      "keyPoints": [
+        {
+          "icon": "🏗️",
+          "title": "AI Studio Build 탭",
+          "body": "aistudio.google.com → Build → Create app → 앱 설명 입력 → 코드 자동 생성"
+        },
+        {
+          "icon": "📦",
+          "title": "로컬 실행",
+          "body": "ZIP 다운로드 → 압축 해제 → npm install → npm run dev → localhost:5173"
+        },
+        {
+          "icon": "🔗",
+          "title": "Gemini API 연동",
+          "body": ".env에 VITE_GEMINI_API_KEY 저장 → src/services/gemini.ts 생성 → 완료"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "AI Studio Build 탭 — 코드 생성 및 미리보기 화면",
+        "alt": "Build 탭 화면"
+      },
+      "callout": {
+        "type": "danger",
+        "text": ".env 파일은 절대 GitHub에 올리면 안 됩니다 — .gitignore 필수 확인"
+      },
+      "notes": "수강자가 직접 앱 설명을 작성해보도록 유도. '회의록 요약기' 예시 활용"
+    },
+    {
+      "id": 5,
+      "type": "content",
+      "step": 3,
+      "stepLabel": "Step 3",
+      "title": "Firebase 프로젝트 생성\n& Firestore DB",
+      "subtitle": "서버 없이 클라우드 데이터베이스 구축",
+      "keyPoints": [
+        {
+          "icon": "🔥",
+          "title": "Firebase 프로젝트",
+          "body": "console.firebase.google.com → 프로젝트 추가 → Firestore Database → 테스트 모드"
+        },
+        {
+          "icon": "🌏",
+          "title": "서울 리전 선택",
+          "body": "asia-northeast3 (서울) 선택 — 한국 사용자 응답속도 최적화"
+        },
+        {
+          "icon": "⚙️",
+          "title": "SDK 설치 & 초기화",
+          "body": "npm install firebase → src/lib/firebase.ts 생성 → .env에 7개 설정값 저장"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "Firebase 콘솔 — Firestore Database 데이터 탭 화면",
+        "alt": "Firestore 화면"
+      },
+      "codeSnippet": {
+        "language": "typescript",
+        "label": "firebase.ts 핵심 코드",
+        "code": "const app = initializeApp(firebaseConfig)\nexport const db = getFirestore(app)\nexport const auth = getAuth(app)"
+      },
+      "notes": "테스트 모드는 30일 후 만료. 배포 전 반드시 보안 규칙 강화 안내"
+    },
+    {
+      "id": 6,
+      "type": "content",
+      "step": 4,
+      "stepLabel": "Step 4",
+      "title": "Google 로그인 세팅",
+      "subtitle": "직원들이 이미 쓰는 Google 계정으로 인증",
+      "keyPoints": [
+        {
+          "icon": "🔐",
+          "title": "Firebase Authentication",
+          "body": "Firebase 콘솔 → Authentication → Sign-in method → Google 공급자 활성화"
+        },
+        {
+          "icon": "👤",
+          "title": "3개 파일로 구현",
+          "body": "auth.ts (Google 로그인 함수) → AuthContext.tsx (전역 상태) → LoginButton.tsx (UI)"
+        },
+        {
+          "icon": "🏢",
+          "title": "회사 도메인 제한 (선택)",
+          "body": "provider.setCustomParameters({ hd: 'yourcompany.com' }) — 특정 도메인만 허용"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "앱에서 Google 계정 선택 팝업이 열린 화면",
+        "alt": "Google 로그인 팝업"
+      },
+      "callout": {
+        "type": "tip",
+        "text": "Google Workspace(Gmail) 사용 조직이라면 별도 계정 관리 불필요 — 최고의 인증 방법"
+      },
+      "notes": "ProtectedRoute 컴포넌트로 비로그인 사용자 차단하는 패턴 강조"
+    },
+    {
+      "id": 7,
+      "type": "content",
+      "step": 5,
+      "stepLabel": "Step 5",
+      "title": "Vercel 배포 & 팀 공유",
+      "subtitle": "GitHub Push만으로 자동 배포",
+      "keyPoints": [
+        {
+          "icon": "🚀",
+          "title": "GitHub → Vercel 연동",
+          "body": "vercel.com → GitHub 연동 → 저장소 선택 → Import → 환경 변수 7개 입력 → Deploy"
+        },
+        {
+          "icon": "🔄",
+          "title": "자동 재배포 (CI/CD)",
+          "body": "코드 수정 → git push → Vercel 자동 감지 → 1~2분 후 새 버전 배포 완료"
+        },
+        {
+          "icon": "🌐",
+          "title": "팀 공유",
+          "body": "your-app.vercel.app URL로 팀 전체 공유 — HTTPS 자동 적용, 커스텀 도메인 연결 가능"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "Vercel 배포 완료 — 'Congratulations!' 화면과 생성된 URL",
+        "alt": "Vercel 배포 완료 화면"
+      },
+      "callout": {
+        "type": "warning",
+        "text": "Firebase 승인 도메인에 Vercel URL 추가 필수 — 없으면 Google 로그인 오류 발생"
+      },
+      "notes": "환경 변수를 Vercel에 직접 입력해야 하는 이유 강조 (.env는 git 제외)"
+    },
+    {
+      "id": 8,
+      "type": "closing",
+      "title": "MVP 완성! 🎉",
+      "subtitle": "오늘 배운 5단계로 무엇이든 만들 수 있습니다",
+      "keyPoints": [
+        {
+          "icon": "✅",
+          "title": "완성한 것들",
+          "body": "Google AI Studio 프롬프트 설계 · React 앱 자동 생성 · Firebase 클라우드 DB · Google 로그인 · Vercel 배포"
+        },
+        {
+          "icon": "🔒",
+          "title": "다음 우선 과제",
+          "body": "Firestore 보안 규칙 프로덕션 모드 전환 · Firebase 도메인 승인 최소화 · API 키 사용량 모니터링"
+        },
+        {
+          "icon": "🚀",
+          "title": "V2 아이디어",
+          "body": "팀 권한 관리 (Firestore 보안 규칙) · 사용 통계 대시보드 · Slack/이메일 웹훅 알림 · 커스텀 도메인"
+        }
+      ],
+      "image": {
+        "placeholder": true,
+        "description": "완성된 앱이 브라우저에서 실행된 화면 — 팀원들이 사용 중인 모습",
+        "alt": "완성 앱 화면"
+      },
+      "callout": {
+        "type": "success",
+        "text": "이 스택(Gemini + Firebase + Vercel)으로 대부분의 내부 업무 도구를 무료로 만들 수 있습니다"
+      },
+      "footer": "FLOW~ : AX Design Lab | 문의: flow@axdesignlab.com",
+      "notes": "Q&A 시간 확보. 참석자 각자의 MVP 아이디어 공유 유도"
+    }
+  ]
+}

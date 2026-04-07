@@ -1,0 +1,8 @@
+node_modules/
+screenshots/
+*.py
+*.js
+*.json
+!slides-data.json
+applet_access_history.json
+package*.json

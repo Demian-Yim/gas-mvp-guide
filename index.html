@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>점심 & 음료 신청 앱 만들기 — AI 따라하기 가이드</title>
+  <style>
+    :root {
+      --blue: #1a73e8;
+      --blue-dark: #1557b0;
+      --blue-light: #e8f0fe;
+      --green: #1e8e3e;
+      --green-light: #e6f4ea;
+      --orange: #ea8600;
+      --orange-light: #fef3e2;
+      --red: #d93025;
+      --red-light: #fce8e6;
+      --gray-bg: #f8f9fa;
+      --gray-border: #e0e0e0;
+      --gray-text: #5f6368;
+      --text: #202124;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-bg);
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.75;
+    }
+
+    /* ===== 헤더 ===== */
+    .header {
+      background: var(--blue);
+      color: white;
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 16px; font-weight: 700; }
+    .header-step { font-size: 13px; opacity: 0.85; background: rgba(255,255,255,0.18); padding: 4px 12px; border-radius: 20px; }
+
+    /* ===== 스텝 네비게이션 ===== */
+    .progress-bar-wrap {
+      background: white;
+      border-bottom: 2px solid var(--gray-border);
+      padding: 0 16px;
+      position: sticky;
+      top: 53px;
+      z-index: 99;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .steps-nav {
+      display: flex;
+      max-width: 760px;
+      margin: 0 auto;
+      min-width: 420px;
+    }
+    .snav-item {
+      flex: 1;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--gray-text);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .snav-item .snav-num {
+      display: block;
+      width: 26px; height: 26px;
+      background: #e0e0e0;
+      color: #666;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 26px;
+      margin: 0 auto 4px;
+      transition: all 0.2s;
+    }
+    .snav-item.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .snav-item.active .snav-num { background: var(--blue); color: white; }
+    .snav-item.done .snav-num { background: var(--green); color: white; }
+    .snav-item.done .snav-num::before { content: "✓"; }
+    .snav-item.done .snav-text { color: var(--green); }
+
+    /* ===== 메인 콘텐츠 ===== */
+    .main { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
+    .step-page { display: none; }
+    .step-page.active { display: block; }
+
+    /* ===== 카드 ===== */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--gray-border);
+    }
+    .card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-border);
+    }
+
+    /* ===== 커버 히어로 ===== */
+    .cover-hero {
+      background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 40px 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .cover-hero .emoji { font-size: 56px; margin-bottom: 14px; }
+    .cover-hero h2 { font-size: 26px; font-weight: 800; line-height: 1.35; margin-bottom: 14px; }
+    .cover-hero p { font-size: 16px; opacity: 0.9; margin-bottom: 28px; line-height: 1.7; }
+
+    /* 전체 흐름 다이어그램 */
+    .flow-diagram {
+      background: rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 20px 16px;
+      margin-bottom: 24px;
+    }
+    .flow-diagram h4 { font-size: 14px; opacity: 0.8; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .flow-item {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .flow-item small { display: block; font-size: 11px; font-weight: 400; opacity: 0.8; margin-top: 2px; }
+    .flow-arrow { font-size: 18px; opacity: 0.6; }
+
+    .start-btn {
+      background: white;
+      color: var(--blue);
+      border: none;
+      padding: 14px 36px;
+      font-size: 17px;
+      font-weight: 700;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .start-btn:hover { transform: scale(1.04); }
+
+    /* ===== 스텝 히어로 ===== */
+    .step-hero {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+      border-left: 5px solid var(--blue);
+    }
+    .step-badge {
+      display: inline-block;
+      background: var(--blue);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .step-hero h2 { font-size: 22px; font-weight: 800; line-height: 1.35; margin-bottom: 8px; }
+    .step-hero p { color: #555; font-size: 16px; line-height: 1.7; }
+    .step-time { font-size: 14px; color: var(--gray-text); margin-top: 8px; }
+
+    /* ===== 액션 리스트 ===== */
+    .action-list {
+      list-style: none;
+      counter-reset: action-counter;
+    }
+    .action-list > li {
+      counter-increment: action-counter;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--gray-border);
+    }
+    .action-list > li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .action-list > li::before {
+      content: counter(action-counter);
+      background: var(--blue);
+      color: white;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .action-text { flex: 1; font-size: 16px; }
+    .action-text strong { color: var(--blue-dark); }
+    .highlight {
+      background: #fff3cd;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      color: #856404;
+    }
+    .click-target {
+      display: inline-block;
+      background: #e8f0fe;
+      color: #1557b0;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      border: 1px solid #c5d5ff;
+      font-size: 15px;
+    }
+
+    /* ===== 스크린샷 박스 ===== */
+    .screenshot-box {
+      background: #f0f4ff;
+      border: 2px solid #c5d5ff;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 14px 0;
+      text-align: center;
+    }
+    .screenshot-box img {
+      width: 100%;
+      display: block;
+      max-height: 320px;
+      object-fit: cover;
+      object-position: top;
+    }
+    .screenshot-box.placeholder { padding: 28px 20px; }
+    .ss-icon { font-size: 32px; margin-bottom: 8px; }
+    .ss-label { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #3c5a9a; }
+    .ss-desc { font-size: 14px; color: #5f6368; line-height: 1.55; }
+    .ss-caption {
+      font-size: 13px;
+      color: var(--gray-text);
+      padding: 7px 14px;
+      background: rgba(0,0,0,0.04);
+      border-top: 1px solid #c5d5ff;
+      text-align: left;
+    }
+
+    /* ===== 알림 박스 ===== */
+    .alert {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin: 14px 0;
+      font-size: 15px;
+    }
+    .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .alert-body strong { display: block; margin-bottom: 3px; }
+    .alert.tip { background: var(--blue-light); border-left: 4px solid var(--blue); }
+    .alert.warn { background: var(--orange-light); border-left: 4px solid var(--orange); }
+    .alert.danger { background: var(--red-light); border-left: 4px solid var(--red); }
+    .alert.success { background: var(--green-light); border-left: 4px solid var(--green); }
+
+    /* ===== 성공 / 에러 박스 ===== */
+    .success-check {
+      background: var(--green-light);
+      border: 2px solid #81c784;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+    }
+    .success-check h4 { font-size: 16px; color: var(--green); margin-bottom: 4px; }
+    .success-check p { font-size: 15px; color: #1b5e20; }
+
+    /* ===== 코드 블록 ===== */
+    .code-wrap {
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .code-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f5f5;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--gray-border);
+    }
+    .code-label { font-size: 13px; color: var(--gray-text); font-weight: 600; }
+    .copy-btn {
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover { background: var(--blue-dark); }
+    .copy-btn.copied { background: var(--green); }
+    .code-body { background: #fafafa; }
+    .code-body pre {
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+      font-family: 'Consolas', 'D2Coding', monospace;
+      color: #202124;
+    }
+
+    /* ===== 링크 버튼 ===== */
+    .link-btn {
+      display: inline-block;
+      background: var(--blue);
+      color: white;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      margin: 8px 4px 8px 0;
+      transition: background 0.15s;
+    }
+    .link-btn:hover { background: var(--blue-dark); }
+    .link-btn.white {
+      background: white;
+      color: var(--blue);
+      border: 2px solid var(--blue);
+    }
+
+    /* ===== 체크리스트 ===== */
+    .checklist { list-style: none; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist input[type="checkbox"] {
+      width: 20px; height: 20px;
+      accent-color: var(--blue);
+      flex-shrink: 0;
+      margin-top: 3px;
+      cursor: pointer;
+    }
+    .checklist label { cursor: pointer; flex: 1; }
+
+    /* ===== 네비게이션 버튼 ===== */
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+    .nav-btn {
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .nav-btn.prev { background: white; color: var(--gray-text); border: 2px solid var(--gray-border); }
+    .nav-btn.next { background: var(--blue); color: white; }
+    .nav-btn:disabled { opacity: 0.35; cursor: default; }
+    .nav-btn.next:hover:not(:disabled) { background: var(--blue-dark); }
+
+    /* ===== 환경변수 테이블 ===== */
+    .env-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 15px; }
+    .env-table th, .env-table td {
+      padding: 10px 14px;
+      border: 1px solid var(--gray-border);
+      text-align: left;
+    }
+    .env-table th { background: var(--gray-bg); font-weight: 700; }
+    .env-table td code {
+      background: var(--blue-light);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Consolas', monospace;
+    }
+
+    /* ===== 완성 화면 ===== */
+    .done-hero {
+      background: linear-gradient(135deg, #1e8e3e 0%, #0d652d 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 44px 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .done-hero .big-emoji { font-size: 64px; margin-bottom: 16px; }
+    .done-hero h2 { font-size: 28px; font-weight: 800; margin-bottom: 14px; }
+    .done-hero p { font-size: 16px; opacity: 0.9; }
+    .done-list {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .done-item {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+    }
+    .done-item:last-child { border-bottom: none; }
+    .done-item .done-icon { font-size: 22px; flex-shrink: 0; }
+
+    /* ===== GAS 팁 카드 ===== */
+    .gas-tip {
+      background: linear-gradient(135deg, #e8f0fe, #f3e8fd);
+      border: 2px solid #c5d5ff;
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin: 16px 0;
+    }
+    .gas-tip h4 { font-size: 16px; font-weight: 700; color: var(--blue-dark); margin-bottom: 10px; }
+    .gas-tip-list { list-style: none; }
+    .gas-tip-list li {
+      padding: 6px 0;
+      font-size: 15px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .gas-tip-list li::before { content: "💬"; flex-shrink: 0; }
+
+    /* ===== 반응형 ===== */
+    @media (max-width: 600px) {
+      .card { padding: 20px 16px; }
+      .cover-hero { padding: 28px 20px; }
+      .cover-hero h2 { font-size: 22px; }
+      .step-hero h2 { font-size: 19px; }
+      .flow-row { gap: 4px; }
+      .flow-item { padding: 6px 10px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 헤더 ===== -->
+<header class="header">
+  <h1>🍱 직장인 AI 앱 만들기 — 따라하기 가이드</h1>
+  <span class="header-step" id="header-step">시작 전</span>
+</header>
+
+<!-- ===== 스텝 네비게이션 ===== -->
+<nav class="progress-bar-wrap">
+  <div class="steps-nav">
+    <div class="snav-item active" onclick="goToStep(0)" id="snav-0">
+      <span class="snav-num">0</span>
+      <span class="snav-text">준비</span>
+    </div>
+    <div class="snav-item" onclick="goToStep(1)" id="snav-1">
+      <span class="snav-num">1</span>
+      <span class="snav-text">앱 만들기</span>
+    </div>
+    <div class="snav-item" onclick="goToStep(2)" id="snav-2">
+      <span class="snav-num">2</span>
+      <span class="snav-text">Firebase</span>
+    </div>
+    <div class="snav-item" onclick="goToStep(3)" id="snav-3">
+      <span class="snav-num">3</span>
+      <span class="snav-text">배포</span>
+    </div>
+    <div class="snav-item" onclick="goToStep(4)" id="snav-4">
+      <span class="snav-num">🎉</span>
+      <span class="snav-text">완성!</span>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ===================================================
+     STEP 0: 커버 & 전체 흐름 & 준비
+==================================================== -->
+<div class="step-page active" id="step-0">
+
+  <div class="cover-hero">
+    <div class="emoji">🍱☕</div>
+    <h2>점심 & 음료 신청 앱<br>직접 만들어봐요!</h2>
+    <p>코딩 몰라도 OK! AI Studio에 말로 설명하면<br>
+    앱이 자동으로 완성됩니다. <strong>브라우저만 있으면 돼요.</strong></p>
+
+    <div class="flow-diagram">
+      <h4>전체 흐름</h4>
+      <div class="flow-row">
+        <div class="flow-item">① 계정 준비<small>5분</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">② AI로 앱 만들기<small>20분</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">③ Firebase 연결<small>15분</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">④ Vercel 배포<small>10분</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">🎉 팀 공유</div>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="goToStep(1)">지금 시작하기 →</button>
+  </div>
+
+  <!-- 어떤 앱을 만드나 -->
+  <div class="card">
+    <h3>🍱 우리가 만들 앱: 점심 & 음료 신청 앱</h3>
+
+    <div class="alert tip">
+      <span class="alert-icon">💡</span>
+      <div class="alert-body">
+        <strong>이런 앱이에요</strong>
+        매일 점심시간 전에 팀원들이 메뉴와 음료를 신청하면, 한 화면에 신청 현황이 모여서 보이는 앱이에요.
+      </div>
+    </div>
+
+    <ul class="action-list">
+      <li>
+        <div class="action-text">
+          <strong>이름 입력 + 점심 메뉴 선택</strong><br>
+          <span style="color:#666;font-size:14px;">불고기덮밥 / 김치찌개 / 파스타 / 샐러드 중 하나 선택</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <strong>음료 선택 후 "신청하기" 클릭</strong><br>
+          <span style="color:#666;font-size:14px;">아메리카노 / 라떼 / 녹차 / 물 중 하나 선택</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <strong>오늘 신청 현황 실시간 확인</strong><br>
+          <span style="color:#666;font-size:14px;">누가 무엇을 신청했는지 목록으로 표시</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <strong>관리자 대시보드</strong> — 메뉴별·음료별 집계<br>
+          <span style="color:#666;font-size:14px;">불고기덮밥 5명 / 파스타 3명 / 아메리카노 7명 등 한눈에 확인</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="success-check">
+      <h4>✅ 이 앱의 특징</h4>
+      <p>인터넷이 되는 어디서든 접속 가능 · 팀 전체가 같은 URL로 사용 · 신청 내역은 Firebase에 자동 저장</p>
+    </div>
+  </div>
+
+  <!-- 준비물 -->
+  <div class="card">
+    <h3>📋 딱 3개 계정만 있으면 됩니다</h3>
+
+    <div class="alert tip">
+      <span class="alert-icon">💡</span>
+      <div class="alert-body">
+        모두 무료! 설치할 프로그램 없어요. Google 계정 하나로 나머지도 쉽게 만들 수 있어요.
+      </div>
+    </div>
+
+    <ul class="checklist">
+      <li>
+        <input type="checkbox" id="c0-1" onchange="saveCheck('c0-1',this.checked)">
+        <label for="c0-1">
+          <strong>① Google 계정</strong> — 이미 있으면 OK!<br>
+          <span style="color:#666;font-size:14px;">AI Studio와 Firebase에서 사용</span>
+        </label>
+      </li>
+      <li>
+        <input type="checkbox" id="c0-2" onchange="saveCheck('c0-2',this.checked)">
+        <label for="c0-2">
+          <strong>② GitHub 계정</strong> — 코드 저장소<br>
+          <a href="https://github.com/signup" target="_blank" class="link-btn" style="font-size:14px;padding:7px 16px;margin-top:8px;">GitHub 가입하기 →</a>
+          <br><span style="color:#666;font-size:14px;">이메일로 30초 만에 가입 완료</span>
+        </label>
+      </li>
+      <li>
+        <input type="checkbox" id="c0-3" onchange="saveCheck('c0-3',this.checked)">
+        <label for="c0-3">
+          <strong>③ Vercel 계정</strong> — 앱을 인터넷에 올리는 서비스<br>
+          <a href="https://vercel.com/signup" target="_blank" class="link-btn" style="font-size:14px;padding:7px 16px;margin-top:8px;">Vercel 가입하기 →</a>
+          <br><span style="color:#666;font-size:14px;">GitHub 계정으로 바로 가입 가능</span>
+        </label>
+      </li>
+    </ul>
+
+    <div class="screenshot-box">
+      <img src="screenshots/step0_github_landing.png" alt="GitHub 가입 화면"
+           onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'"
+           style="display:block">
+      <div style="display:none">
+        <div class="ss-icon">🐙</div>
+        <div class="ss-label">GitHub 가입 화면</div>
+        <div class="ss-desc">github.com 접속 → 우측 상단 "Sign up" 클릭 → 이메일과 비밀번호 입력</div>
+      </div>
+      <div class="ss-caption">↑ GitHub 가입 화면 — Sign up을 클릭해서 계정을 만드세요</div>
+    </div>
+
+    <div class="success-check">
+      <h4>✅ 3개 계정 모두 준비했다면 시작!</h4>
+      <p>아래 "다음" 버튼을 눌러 앱 만들기를 시작하세요.</p>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="nav-btn prev" disabled>← 이전</button>
+    <button class="nav-btn next" onclick="goToStep(1)">다음: AI로 앱 만들기 →</button>
+  </div>
+</div>
+
+
+<!-- ===================================================
+     STEP 1: 앱 만들기 (GAS Build + GitHub 커밋)
+==================================================== -->
+<div class="step-page" id="step-1">
+
+  <div class="step-hero">
+    <div class="step-badge">Step 1</div>
+    <h2>🤖 AI Studio로 앱 코드 만들고 GitHub에 저장</h2>
+    <p>AI에게 앱 설명을 붙여넣으면 코드가 자동으로 완성돼요.<br>
+    완성되면 AI Studio에서 바로 GitHub에 저장합니다. ZIP 다운로드나 터미널 없이요!</p>
+    <div class="step-time">⏱️ 약 20분</div>
+  </div>
+
+  <!-- 1. AI Studio 접속 -->
+  <div class="card">
+    <h3>① Google AI Studio 열기</h3>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          아래 버튼으로 <strong>Google AI Studio</strong>를 새 탭에서 여세요<br><br>
+          <a href="https://aistudio.google.com" target="_blank" class="link-btn">Google AI Studio 열기 →</a>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          Google 계정으로 로그인 (이미 로그인되어 있으면 바로 진행)
+          <div class="screenshot-box">
+            <img src="screenshots/step0_aistudio_landing.png" alt="AI Studio 화면"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">🤖</div>
+              <div class="ss-label">Google AI Studio 메인 화면</div>
+              <div class="ss-desc">로그인하면 "Create new prompt", "Build", "My library" 등 메뉴가 보여요</div>
+            </div>
+            <div class="ss-caption">↑ 이런 화면이 보이면 로그인 성공!</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          왼쪽 메뉴에서 <span class="click-target">Build</span> 클릭 → <span class="click-target">Create app</span> 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_build_tab.png" alt="AI Studio Build 탭"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">📱</div>
+              <div class="ss-label">AI Studio — Build 탭</div>
+              <div class="ss-desc">왼쪽 메뉴에서 <strong>"Build"</strong>를 클릭하면 새 채팅 화면이 열려요.<br>오른쪽에 앱 미리보기 화면이 함께 나타납니다.</div>
+            </div>
+            <div class="ss-caption">↑ AI Studio Build 탭 — 왼쪽 채팅창, 오른쪽 미리보기</div>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- 2. 모델 선택 -->
+  <div class="card">
+    <h3>② 모델 선택: Gemini Flash</h3>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          화면 오른쪽 위 모델 선택 드롭다운 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_model_dropdown.png" alt="모델 선택 드롭다운"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">⚡</div>
+              <div class="ss-label">모델 선택 드롭다운</div>
+              <div class="ss-desc">오른쪽 상단에 현재 모델명이 표시돼요 (예: "Gemini 2.0 Pro")<br>클릭하면 모델 목록이 펼쳐집니다</div>
+            </div>
+            <div class="ss-caption">↑ 오른쪽 위 드롭다운 → Gemini 2.0 Flash 선택</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          목록에서 <span class="highlight">Gemini 2.0 Flash</span> 또는 <span class="highlight">Gemini Flash</span> 선택<br>
+          <span style="color:#666;font-size:14px;">Flash 모델이 빠르고, MVP에 딱 맞아요</span>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- 3. 앱 설명 입력 -->
+  <div class="card">
+    <h3>③ 앱 설명 붙여넣기</h3>
+
+    <div class="alert warn">
+      <span class="alert-icon">📋</span>
+      <div class="alert-body">
+        <strong>아래 내용을 그대로 복사해서 붙여넣으세요</strong>
+        수정 없이 그대로 넣어도 됩니다. 나중에 채팅으로 바꿀 수 있어요.
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-top">
+        <span class="code-label">AI Studio Build 채팅창에 붙여넣기</span>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="code-body"><pre>직장인용 점심 & 음료 신청 앱을 만들어줘.
+
+점심 메뉴: 불고기덮밥, 김치찌개, 파스타, 샐러드
+음료: 아메리카노, 라떼, 녹차, 물
+
+화면 2개:
+1. 신청 화면: 이름 + 메뉴/음료 선택 + "신청하기" 버튼 → Firebase 저장
+2. 관리자 화면: 오늘 전체 신청 목록 + 메뉴별/음료별 집계 숫자
+
+디자인: 깔끔한 흰색 배경, 한국어 UI, 모바일 최적화
+
+Firebase 설정은 나중에 알려줄게. 지금은 아래처럼 빈 값으로 코드 작성해줘:
+const firebaseConfig = {
+  apiKey: "FILL_IN",
+  authDomain: "FILL_IN",
+  projectId: "FILL_IN",
+  storageBucket: "FILL_IN",
+  messagingSenderId: "FILL_IN",
+  appId: "FILL_IN"
+};</pre></div>
+    </div>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          위 내용을 복사해서 AI Studio 채팅창에 붙여넣고 <strong>엔터(전송)</strong>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          AI가 코드를 작성합니다 (1~2분 대기)<br>
+          오른쪽 미리보기에 앱 화면이 나타나면 완성!
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_app_preview.png" alt="앱 미리보기"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">✨</div>
+              <div class="ss-label">AI가 앱을 만드는 중...</div>
+              <div class="ss-desc">왼쪽 채팅에 코드가 생성되고, 오른쪽에 앱 미리보기가 나타나요.<br>메뉴 선택 폼과 신청 목록이 보이면 성공!</div>
+            </div>
+            <div class="ss-caption">↑ 오른쪽에 앱 미리보기가 나타나면 완성!</div>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <!-- GAS 채팅으로 수정 팁 -->
+    <div class="gas-tip">
+      <h4>💬 마음에 안 드는 부분? GAS 채팅창에 바로 요청하세요!</h4>
+      <ul class="gas-tip-list">
+        <li>"배경을 연한 파란색으로 바꿔줘"</li>
+        <li>"신청 버튼을 더 크게 만들어줘"</li>
+        <li>"관리자 화면에 날짜 필터도 추가해줘"</li>
+        <li>"집계 숫자 옆에 그래프도 표시해줘"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4. GitHub에 저장 (GAS 버튼) -->
+  <div class="card">
+    <h3>④ GitHub에 저장 (AI Studio 버튼 사용)</h3>
+
+    <div class="alert tip">
+      <span class="alert-icon">🚀</span>
+      <div class="alert-body">
+        <strong>ZIP 다운로드 없이 바로 저장!</strong>
+        AI Studio 오른쪽 위에 GitHub 연결 버튼이 있어요. 클릭 한 번으로 코드가 GitHub에 저장됩니다.
+      </div>
+    </div>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          AI Studio Build 화면 <strong>오른쪽 위</strong>에서 <span class="click-target">GitHub 아이콘</span> 또는 <span class="click-target">Export to GitHub</span> 버튼 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_github_button.png" alt="GitHub 버튼"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">📂</div>
+              <div class="ss-label">AI Studio 오른쪽 상단 — GitHub 버튼</div>
+              <div class="ss-desc">오른쪽 위에 GitHub 고양이 아이콘(🐙) 또는 "GitHub에 저장" 버튼이 있어요.<br>
+              찾기 어려우면 <strong>채팅창에 "GitHub에 업로드해줘"</strong> 라고 요청해도 됩니다!</div>
+            </div>
+            <div class="ss-caption">↑ AI Studio 오른쪽 위 — GitHub 저장 버튼</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          처음 사용 시 → <span class="click-target">GitHub 계정 연결</span> 클릭 → GitHub 로그인 후 권한 허용
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_github_auth.png" alt="GitHub 연결 화면"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">🔗</div>
+              <div class="ss-label">GitHub 계정 연결 화면</div>
+              <div class="ss-desc">"Authorize Google AI Studio" 버튼이 나타나요.<br>클릭하면 AI Studio와 GitHub이 연결됩니다. (처음 1회만)</div>
+            </div>
+            <div class="ss-caption">↑ "Authorize" 클릭 → AI Studio와 GitHub 연결 (처음 1회만)</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          저장소(Repository) 이름 입력: <span class="highlight">lunch-app</span> → <span class="click-target">Create and push</span> 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_repo_name.png" alt="저장소 이름 입력"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">📝</div>
+              <div class="ss-label">새 저장소 이름 입력</div>
+              <div class="ss-desc">저장소 이름을 영어로 입력하고 "Create and push" 버튼을 클릭하세요.<br>
+              잠깐 기다리면 코드가 GitHub에 저장됩니다!</div>
+            </div>
+            <div class="ss-caption">↑ "lunch-app" 입력 → Create and push 클릭</div>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 성공 확인</h4>
+      <p>GitHub에서 <strong>lunch-app</strong> 저장소가 생기고, <code>package.json</code>, <code>src/</code> 등이 보이면 완성!</p>
+    </div>
+  </div>
+
+  <!-- Step 1 체크리스트 -->
+  <div class="card">
+    <h3>✅ Step 1 완료 체크</h3>
+    <ul class="checklist">
+      <li>
+        <input type="checkbox" id="c1-1" onchange="saveCheck('c1-1',this.checked)">
+        <label for="c1-1">AI Studio Build 탭 열기 완료</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c1-2" onchange="saveCheck('c1-2',this.checked)">
+        <label for="c1-2">Gemini Flash 모델 선택 완료</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c1-3" onchange="saveCheck('c1-3',this.checked)">
+        <label for="c1-3">앱 설명 붙여넣기 → 코드 생성 완료</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c1-4" onchange="saveCheck('c1-4',this.checked)">
+        <label for="c1-4">GitHub 버튼으로 저장소에 코드 저장 완료</label>
+      </li>
+    </ul>
+  </div>
+
+  <div class="step-nav">
+    <button class="nav-btn prev" onclick="goToStep(0)">← 이전</button>
+    <button class="nav-btn next" onclick="goToStep(2)">다음: Firebase 연결 →</button>
+  </div>
+</div>
+
+
+<!-- ===================================================
+     STEP 2: Firebase
+==================================================== -->
+<div class="step-page" id="step-2">
+
+  <div class="step-hero">
+    <div class="step-badge">Step 2</div>
+    <h2>🔥 Firebase — 데이터 저장소 만들기</h2>
+    <p>Firebase는 Google이 제공하는 무료 데이터베이스예요.<br>
+    신청 내역이 여기 저장되고, 팀 전체가 실시간으로 볼 수 있어요.</p>
+    <div class="step-time">⏱️ 약 15분</div>
+  </div>
+
+  <!-- Firebase 프로젝트 -->
+  <div class="card">
+    <h3>① Firebase 프로젝트 만들기</h3>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          아래 버튼으로 <strong>Firebase 콘솔</strong>을 여세요<br><br>
+          <a href="https://console.firebase.google.com" target="_blank" class="link-btn">Firebase 콘솔 열기 →</a>
+          <div class="screenshot-box">
+            <img src="screenshots/step2_firebase_home.png" alt="Firebase 홈"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">🔥</div>
+              <div class="ss-label">Firebase 홈 화면</div>
+              <div class="ss-desc">firebase.google.com 접속 후 "콘솔로 이동" 클릭</div>
+            </div>
+            <div class="ss-caption">↑ Firebase 홈 — 우측 상단 "콘솔로 이동" 클릭 → Google 로그인</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">프로젝트 추가</span> 클릭 (또는 "+ Add project")
+          <div class="screenshot-box">
+            <img src="screenshots/step2_firebase_new_project.png" alt="Firebase 프로젝트 추가"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">➕</div>
+              <div class="ss-label">프로젝트 추가 버튼</div>
+              <div class="ss-desc">로그인 후 화면 중앙에 큰 <strong>"프로젝트 추가"</strong> 카드가 있어요. 클릭하세요.</div>
+            </div>
+            <div class="ss-caption">↑ Firebase 콘솔 → "프로젝트 추가" 클릭</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          프로젝트 이름 입력: <span class="highlight">lunch-app</span><br>
+          <span style="color:#666;font-size:14px;">영어 소문자와 하이픈만 사용 가능해요</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          Google Analytics → <span class="click-target">지금은 사용 안 함</span> 선택<br>
+          → <span class="click-target">프로젝트 만들기</span> 클릭 → 완료 후 <span class="click-target">계속</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 성공 확인</h4>
+      <p>왼쪽에 메뉴가 있는 <strong>프로젝트 대시보드</strong>가 나타나면 완성!</p>
+    </div>
+  </div>
+
+  <!-- Firestore -->
+  <div class="card">
+    <h3>② Firestore 데이터베이스 만들기</h3>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          왼쪽 메뉴 → <span class="click-target">빌드</span> → <span class="click-target">Firestore Database</span> 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step2_firebase_firestore.png" alt="Firestore Database"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">📊</div>
+              <div class="ss-label">왼쪽 메뉴 — 빌드 → Firestore Database</div>
+              <div class="ss-desc">왼쪽 메뉴에서 "빌드"를 클릭하면 하위 메뉴가 펼쳐져요.<br>
+              그 안에 <strong>"Firestore Database"</strong>가 있습니다. 클릭하세요.</div>
+            </div>
+            <div class="ss-caption">↑ 빌드 → Firestore Database → 데이터베이스 만들기</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">데이터베이스 만들기</span> 버튼 클릭
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">테스트 모드로 시작</span> 선택 → <span class="click-target">다음</span><br>
+          <span style="color:#666;font-size:14px;">⚠️ 테스트 모드는 30일 후 만료돼요. 나중에 보안 설정을 바꿔야 합니다.</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          위치 선택: <span class="highlight">asia-northeast3 (서울)</span> → <span class="click-target">완료</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 성공 확인</h4>
+      <p>"데이터" 탭이 있는 Firestore 화면이 나타나면 완성!</p>
+    </div>
+  </div>
+
+  <!-- Authentication -->
+  <div class="card">
+    <h3>③ Google 로그인 켜기</h3>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          왼쪽 메뉴 → <span class="click-target">빌드</span> → <span class="click-target">Authentication</span> 클릭 → <span class="click-target">시작하기</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">Sign-in method</span> 탭 → 공급자 목록에서 <span class="click-target">Google</span> 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step2_firebase_auth.png" alt="Firebase Authentication"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">🔐</div>
+              <div class="ss-label">Authentication — Sign-in method 탭</div>
+              <div class="ss-desc">공급자 목록에 "Google"이 보여요. 클릭하면 설정 패널이 열립니다.</div>
+            </div>
+            <div class="ss-caption">↑ Sign-in method → Google 클릭 → 사용 설정 ON → 저장</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">사용 설정</span> 토글 → ON으로 변경 → 지원 이메일 선택 → <span class="click-target">저장</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 성공 확인</h4>
+      <p>Google 항목이 <strong>"사용 설정됨"</strong>으로 바뀌면 완성!</p>
+    </div>
+  </div>
+
+  <!-- Config → GAS로 돌아가기 -->
+  <div class="card">
+    <h3>④ Firebase 설정값 복사 → AI Studio에 붙여넣기</h3>
+
+    <div class="alert tip">
+      <span class="alert-icon">💡</span>
+      <div class="alert-body">
+        <strong>Vercel 환경변수 입력 필요 없어요!</strong>
+        설정값을 GAS 채팅창에 넣으면 AI가 코드에 직접 넣어줍니다. Vercel 설정이 훨씬 간단해져요.
+      </div>
+    </div>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          Firebase 콘솔 → 왼쪽 상단 <strong>톱니바퀴(⚙️)</strong> → <span class="click-target">프로젝트 설정</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          아래 스크롤 → <strong>"내 앱"</strong> → 웹 아이콘 <span class="click-target">&lt;/&gt;</span> 클릭 → 앱 닉네임 입력(아무거나) → <span class="click-target">앱 등록</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          화면에 나타난 <strong>firebaseConfig 코드 블록 전체 복사</strong>
+          <div class="screenshot-box" style="margin-top:12px;margin-bottom:12px;">
+            <img src="screenshots/step2_firebase_config.png" alt="Firebase 설정 코드"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">📋</div>
+              <div class="ss-label">Firebase 설정 코드 화면</div>
+              <div class="ss-desc">프로젝트 설정 → 내 앱 아래에 <strong>firebaseConfig</strong> 코드가 나타나요.<br>블록 전체를 드래그해서 복사하세요.</div>
+            </div>
+            <div class="ss-caption">↑ 이 코드 블록 전체 복사!</div>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-top">
+              <span class="code-label">이렇게 생긴 코드가 나와요 — 전체 복사!</span>
+            </div>
+            <div class="code-body"><pre>const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "lunch-app.firebaseapp.com",
+  projectId: "lunch-app",
+  storageBucket: "lunch-app.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123:web:abc..."
+};</pre></div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <strong>AI Studio Build 탭으로 돌아가서</strong> 채팅창에 아래처럼 입력하세요:<br><br>
+          <div class="code-wrap">
+            <div class="code-top">
+              <span class="code-label">GAS 채팅창 입력</span>
+              <button class="copy-btn" onclick="copyCode(this)">복사</button>
+            </div>
+            <div class="code-body"><pre>Firebase 설정값을 아래로 교체해줘. 그리고 GitHub에 다시 커밋해줘.
+
+(여기에 복사한 firebaseConfig 붙여넣기)</pre></div>
+          </div>
+          <span style="color:#666;font-size:14px;">AI가 코드에 설정값을 채워 넣고 GitHub에 자동으로 커밋해줘요.</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 완료! 이제 Vercel에서 환경변수 입력이 필요 없어요</h4>
+      <p>GitHub 저장소에 Firebase 설정이 포함된 최신 코드가 올라갔습니다.</p>
+    </div>
+  </div>
+
+  <!-- Step 2 체크리스트 -->
+  <div class="card">
+    <h3>✅ Step 2 완료 체크</h3>
+    <ul class="checklist">
+      <li>
+        <input type="checkbox" id="c2-1" onchange="saveCheck('c2-1',this.checked)">
+        <label for="c2-1">Firebase 프로젝트 생성</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c2-2" onchange="saveCheck('c2-2',this.checked)">
+        <label for="c2-2">Firestore Database 활성화 (서울 선택)</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c2-3" onchange="saveCheck('c2-3',this.checked)">
+        <label for="c2-3">Authentication → Google 로그인 사용 설정됨</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c2-4" onchange="saveCheck('c2-4',this.checked)">
+        <label for="c2-4">GAS에 firebaseConfig 붙여넣기 → GitHub 재커밋 완료</label>
+      </li>
+    </ul>
+  </div>
+
+  <div class="step-nav">
+    <button class="nav-btn prev" onclick="goToStep(1)">← 이전</button>
+    <button class="nav-btn next" onclick="goToStep(3)">다음: Vercel 배포 →</button>
+  </div>
+</div>
+
+
+<!-- ===================================================
+     STEP 3: Vercel 배포
+==================================================== -->
+<div class="step-page" id="step-3">
+
+  <div class="step-hero">
+    <div class="step-badge">Step 3</div>
+    <h2>🚀 Vercel로 팀에 배포하기</h2>
+    <p>GitHub에 올린 코드를 Vercel에 연결하면<br>
+    인터넷 주소(URL)가 생겨서 팀 전체가 접속할 수 있어요.</p>
+    <div class="step-time">⏱️ 약 10분</div>
+  </div>
+
+  <!-- Vercel 배포 -->
+  <div class="card">
+    <h3>① GitHub 저장소를 Vercel에 연결</h3>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          아래 버튼으로 <strong>Vercel</strong>을 새 탭에서 여세요<br><br>
+          <a href="https://vercel.com/dashboard" target="_blank" class="link-btn">Vercel 대시보드 열기 →</a>
+          <div class="screenshot-box">
+            <img src="screenshots/step3_vercel_landing.png" alt="Vercel 화면"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">▲</div>
+              <div class="ss-label">Vercel 대시보드</div>
+              <div class="ss-desc">로그인 후 대시보드가 보입니다</div>
+            </div>
+            <div class="ss-caption">↑ Vercel — GitHub 계정으로 로그인 후 대시보드</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">Add New...</span> → <span class="click-target">Project</span> 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step3_vercel_import.png" alt="Vercel Import"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">➕</div>
+              <div class="ss-label">Add New Project</div>
+              <div class="ss-desc">대시보드 오른쪽 위에 있는 <strong>"Add New..."</strong> 버튼을 클릭하고, "Project"를 선택하세요.</div>
+            </div>
+            <div class="ss-caption">↑ Vercel → "Import Git Repository" → Continue with GitHub</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          GitHub 저장소 목록에서 <span class="highlight">lunch-app</span> 찾기 → <span class="click-target">Import</span> 클릭
+          <div class="screenshot-box">
+            <img src="screenshots/step3_vercel_import_repo.png" alt="Vercel 저장소 선택"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">📂</div>
+              <div class="ss-label">저장소 목록에서 lunch-app 선택</div>
+              <div class="ss-desc">Step 1에서 만든 "lunch-app" 저장소가 목록에 보여요.<br>
+              옆에 있는 <strong>"Import"</strong> 버튼을 클릭하세요.</div>
+            </div>
+            <div class="ss-caption">↑ 저장소 목록에서 lunch-app → Import 클릭</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          빌드 설정 그대로 두고 → <span class="click-target">Deploy</span> 버튼 클릭!
+          <div class="alert success" style="margin-top:12px;">
+            <span class="alert-icon">✅</span>
+            <div class="alert-body">
+              <strong>환경변수 입력 불필요!</strong>
+              Step 2에서 GAS에 Firebase 설정값을 직접 넣었기 때문에 Vercel에서 별도로 입력할 것이 없어요.
+            </div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          1~2분 기다리면 "Congratulations! 🎉" 화면이 나타납니다<br>
+          화면에 표시된 URL이 우리 앱 주소예요 (예: <code>lunch-app.vercel.app</code>)
+          <div class="screenshot-box">
+            <img src="screenshots/step3_vercel_success.png" alt="배포 완료"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">🎉</div>
+              <div class="ss-label">배포 완료 화면</div>
+              <div class="ss-desc"><strong>"Congratulations!"</strong> 메시지와 함께 앱 URL이 표시돼요.<br>클릭하면 바로 앱이 열립니다!</div>
+            </div>
+            <div class="ss-caption">↑ Congratulations! — 앱 URL을 클릭해서 확인하세요</div>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 성공 확인</h4>
+      <p>URL을 클릭했을 때 점심 신청 앱 화면이 보이면 완성!</p>
+    </div>
+  </div>
+
+  <!-- Firebase 도메인 등록 -->
+  <div class="card">
+    <h3>③ Firebase에 Vercel 주소 등록 (Google 로그인 오류 방지)</h3>
+
+    <div class="alert warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body">
+        이 단계를 빠뜨리면 배포된 앱에서 Google 로그인이 안 됩니다!
+      </div>
+    </div>
+
+    <ol class="action-list">
+      <li>
+        <div class="action-text">
+          Firebase 콘솔 → <span class="click-target">Authentication</span> → <span class="click-target">Settings</span> 탭
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <span class="click-target">승인된 도메인</span> → <span class="click-target">도메인 추가</span> 클릭
+          <div class="screenshot-box" style="margin-top:12px;">
+            <img src="screenshots/step3_firebase_domain.png" alt="Firebase 승인 도메인"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">🌐</div>
+              <div class="ss-label">Firebase — 승인된 도메인 설정</div>
+              <div class="ss-desc">Authentication → Settings 탭 → 승인된 도메인 섹션에 <strong>"도메인 추가"</strong> 버튼이 있어요.</div>
+            </div>
+            <div class="ss-caption">↑ "도메인 추가" 클릭 → Vercel URL 입력</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          Vercel에서 받은 URL 입력 (예: <span class="highlight">lunch-app.vercel.app</span>) → <span class="click-target">추가</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="success-check">
+      <h4>✅ 이제 Google 로그인도 정상 작동해요!</h4>
+      <p>배포된 URL에서 "Google로 로그인" 버튼이 정상 작동하면 완성!</p>
+    </div>
+  </div>
+
+  <!-- Step 3 체크리스트 -->
+  <div class="card">
+    <h3>✅ Step 3 완료 체크</h3>
+    <ul class="checklist">
+      <li>
+        <input type="checkbox" id="c3-1" onchange="saveCheck('c3-1',this.checked)">
+        <label for="c3-1">Vercel에서 lunch-app GitHub 저장소 Import</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c3-2" onchange="saveCheck('c3-2',this.checked)">
+        <label for="c3-2">Deploy 클릭 → 배포 완료 — URL 확인</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c3-3" onchange="saveCheck('c3-3',this.checked)">
+        <label for="c3-3">Firebase 승인 도메인에 Vercel URL 추가</label>
+      </li>
+      <li>
+        <input type="checkbox" id="c3-4" onchange="saveCheck('c3-4',this.checked)">
+        <label for="c3-4">배포된 URL에서 신청 & 관리자 화면 동작 확인</label>
+      </li>
+    </ul>
+  </div>
+
+  <div class="step-nav">
+    <button class="nav-btn prev" onclick="goToStep(2)">← 이전</button>
+    <button class="nav-btn next" onclick="goToStep(4)">완성 화면 보기 🎉</button>
+  </div>
+</div>
+
+
+<!-- ===================================================
+     STEP 4: 완성!
+==================================================== -->
+<div class="step-page" id="step-4">
+
+  <div class="done-hero">
+    <div class="big-emoji">🎉</div>
+    <h2>점심 & 음료 신청 앱 완성!</h2>
+    <p>URL을 팀원들에게 공유하면 바로 사용할 수 있어요</p>
+  </div>
+
+  <div class="done-list">
+    <div class="done-item">
+      <span class="done-icon">✅</span>
+      <span>AI Studio Build로 앱 코드 자동 생성</span>
+    </div>
+    <div class="done-item">
+      <span class="done-icon">✅</span>
+      <span>GitHub에 코드 저장 (AI Studio 버튼 1클릭)</span>
+    </div>
+    <div class="done-item">
+      <span class="done-icon">✅</span>
+      <span>Firebase Firestore로 신청 데이터 저장</span>
+    </div>
+    <div class="done-item">
+      <span class="done-icon">✅</span>
+      <span>Google 로그인으로 팀원 인증</span>
+    </div>
+    <div class="done-item">
+      <span class="done-icon">✅</span>
+      <span>Vercel로 배포 — 팀 전체가 URL로 접속</span>
+    </div>
+  </div>
+
+  <!-- 팀 공유 -->
+  <div class="card">
+    <h3>📢 팀에 공유하기</h3>
+    <p>카카오톡이나 이메일로 아래 메시지를 보내세요:</p>
+    <div class="code-wrap" style="margin-top:12px;">
+      <div class="code-top">
+        <span class="code-label">팀 공유 메시지</span>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="code-body"><pre>안녕하세요! 점심 & 음료 신청 앱을 만들었어요 🍱☕
+
+📱 앱 주소: https://lunch-app.vercel.app
+
+Google 계정으로 로그인하면 바로 사용 가능합니다!
+매일 점심 전에 미리 신청해주세요.</pre></div>
+    </div>
+  </div>
+
+  <!-- 앱 수정하고 싶을 때 -->
+  <div class="card">
+    <h3>🔧 앱을 바꾸고 싶을 때</h3>
+
+    <div class="gas-tip">
+      <h4>💬 GAS 채팅창에 이렇게 요청하세요</h4>
+      <ul class="gas-tip-list">
+        <li>"메뉴에 '비빔밥'을 추가해줘"</li>
+        <li>"신청 기한을 오전 11시로 제한해줘"</li>
+        <li>"관리자만 볼 수 있는 집계 화면 추가해줘"</li>
+        <li>"오늘 신청 현황을 엑셀로 다운받는 버튼 추가해줘"</li>
+        <li>"한 사람이 하루에 한 번만 신청할 수 있게 해줘"</li>
+      </ul>
+    </div>
+
+    <div class="alert tip">
+      <span class="alert-icon">🔄</span>
+      <div class="alert-body">
+        <strong>수정 후 배포하는 법</strong>
+        GAS에서 수정 → GitHub 버튼으로 다시 커밋 → Vercel이 자동으로 새 버전 배포 (1~2분)
+      </div>
+    </div>
+  </div>
+
+  <!-- 다음 단계 아이디어 -->
+  <div class="card">
+    <h3>💡 다음에 만들 수 있는 앱</h3>
+    <ul class="action-list">
+      <li>
+        <div class="action-text">
+          <strong>회의록 자동 요약기</strong><br>
+          <span style="color:#666;font-size:14px;">회의록을 붙여넣으면 AI가 3줄 요약 + 액션아이템 정리</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <strong>휴가/재택 신청 관리 앱</strong><br>
+          <span style="color:#666;font-size:14px;">신청, 승인, 달력 뷰까지 한 번에</span>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          <strong>고객 피드백 분석 도구</strong><br>
+          <span style="color:#666;font-size:14px;">고객 의견을 붙여넣으면 AI가 감정 분석 + 핵심 이슈 정리</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="step-nav">
+    <button class="nav-btn prev" onclick="goToStep(3)">← 이전</button>
+    <button class="nav-btn next" disabled>완성! 🎉</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+  const STEP_LABELS = ['시작 전 준비', 'AI로 앱 만들기', 'Firebase 연결', 'Vercel 배포', '완성! 🎉'];
+  const TOTAL_STEPS = 5;
+
+  /* ===== 스텝 이동 ===== */
+  function goToStep(n) {
+    // 모든 스텝 페이지 숨기기
+    document.querySelectorAll('.step-page').forEach(el => el.classList.remove('active'));
+    // 네비게이션 상태 업데이트
+    document.querySelectorAll('.snav-item').forEach((el, i) => {
+      el.classList.remove('active', 'done');
+      if (i < n) el.classList.add('done');
+    });
+
+    // 선택된 스텝 활성화
+    const stepEl = document.getElementById('step-' + n);
+    const snavEl = document.getElementById('snav-' + n);
+    if (stepEl) stepEl.classList.add('active');
+    if (snavEl) snavEl.classList.add('active');
+
+    // 헤더 텍스트 업데이트
+    const headerStep = document.getElementById('header-step');
+    if (headerStep) headerStep.textContent = STEP_LABELS[n] || '';
+
+    // 부드러운 스크롤 (항상 스텝 상단으로)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ===== 코드 복사 ===== */
+  function copyCode(btn) {
+    const codeWrap = btn.closest('.code-wrap');
+    if (!codeWrap) return;
+    const pre = codeWrap.querySelector('pre');
+    const text = pre ? pre.innerText : '';
+    if (!text) return;
+
+    const onSuccess = () => {
+      btn.textContent = '✓ 복사됨!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+    };
+
+    // 최신 Clipboard API 우선 시도
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+        fallbackCopy(text, onSuccess);
+      });
+    } else {
+      fallbackCopy(text, onSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); callback(); } catch(e) { console.warn('복사 실패:', e); }
+    document.body.removeChild(ta);
+  }
+
+  /* ===== 체크박스 저장 ===== */
+  function saveCheck(id, checked) {
+    try {
+      localStorage.setItem('check_' + id, checked ? '1' : '0');
+    } catch(e) { /* localStorage 사용 불가 환경 대비 */ }
+  }
+
+  /* ===== 페이지 로드 시 체크 상태 즉시 복원 ===== */
+  // DOMContentLoaded 대신 즉시 실행 — body 끝에 있어서 DOM이 이미 완성됨
+  (function restoreChecks() {
+    try {
+      document.querySelectorAll('input[type="checkbox"][id^="c"]').forEach(cb => {
+        if (localStorage.getItem('check_' + cb.id) === '1') {
+          cb.checked = true;
+        }
+      });
+    } catch(e) { /* localStorage 접근 실패 시 무시 */ }
+  })();
+</script>
+</body>
+</html>
