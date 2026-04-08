@@ -854,7 +854,7 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          저장소(Repository) 이름 입력: <span class="highlight">lunch-app</span> → <span class="click-target">Create and push</span> 클릭
+          저장소(Repository) 이름 입력: <span class="highlight">office-lunch-app</span> → <span class="click-target">Create and push</span> 클릭
           <div class="screenshot-box">
             <img src="screenshots/_pending_step1_gas_repo_name.png" alt="저장소 이름 입력"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
@@ -864,7 +864,7 @@ const firebaseConfig = {
               <div class="ss-desc">저장소 이름을 영어로 입력하고 "Create and push" 버튼을 클릭하세요.<br>
               잠깐 기다리면 코드가 GitHub에 저장됩니다!</div>
             </div>
-            <div class="ss-caption">↑ "lunch-app" 입력 → Create and push 클릭</div>
+            <div class="ss-caption">↑ "office-lunch-app" 입력 → Create and push 클릭</div>
           </div>
         </div>
       </li>
@@ -872,7 +872,7 @@ const firebaseConfig = {
 
     <div class="success-check">
       <h4>✅ 성공 확인</h4>
-      <p>GitHub에서 <strong>lunch-app</strong> 저장소가 생기고, <code>package.json</code>, <code>src/</code> 등이 보이면 완성!</p>
+      <p>GitHub에서 <strong>office-lunch-app</strong> 저장소가 생기고, <code>package.json</code>, <code>src/</code> 등이 보이면 완성!</p>
     </div>
   </div>
 
@@ -957,7 +957,7 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          프로젝트 이름 입력: <span class="highlight">lunch-app</span><br>
+          프로젝트 이름 입력: <span class="highlight">office-lunch-app</span><br>
           <span style="color:#666;font-size:14px;">영어 소문자와 하이픈만 사용 가능해요</span>
         </div>
       </li>
@@ -1100,9 +1100,9 @@ const firebaseConfig = {
             </div>
             <div class="code-body"><pre>const firebaseConfig = {
   apiKey: "AIzaSy...",
-  authDomain: "lunch-app.firebaseapp.com",
-  projectId: "lunch-app",
-  storageBucket: "lunch-app.appspot.com",
+  authDomain: "office-lunch-app.firebaseapp.com",
+  projectId: "office-lunch-app",
+  storageBucket: "office-lunch-app.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123:web:abc..."
 };</pre></div>
@@ -1213,17 +1213,17 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          GitHub 저장소 목록에서 <span class="highlight">lunch-app</span> 찾기 → <span class="click-target">Import</span> 클릭
+          GitHub 저장소 목록에서 <span class="highlight">office-lunch-app</span> 찾기 → <span class="click-target">Import</span> 클릭
           <div class="screenshot-box">
             <img src="screenshots/step3_vercel_import_repo.png" alt="Vercel 저장소 선택"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
             <div style="display:none">
               <div class="ss-icon">📂</div>
-              <div class="ss-label">저장소 목록에서 lunch-app 선택</div>
-              <div class="ss-desc">Step 1에서 만든 "lunch-app" 저장소가 목록에 보여요.<br>
+              <div class="ss-label">저장소 목록에서 office-lunch-app 선택</div>
+              <div class="ss-desc">Step 1에서 만든 "office-lunch-app" 저장소가 목록에 보여요.<br>
               옆에 있는 <strong>"Import"</strong> 버튼을 클릭하세요.</div>
             </div>
-            <div class="ss-caption">↑ 저장소 목록에서 lunch-app → Import 클릭</div>
+            <div class="ss-caption">↑ 저장소 목록에서 office-lunch-app → Import 클릭</div>
           </div>
         </div>
       </li>
@@ -1242,7 +1242,8 @@ const firebaseConfig = {
       <li>
         <div class="action-text">
           1~2분 기다리면 "Congratulations! 🎉" 화면이 나타납니다<br>
-          화면에 표시된 URL이 우리 앱 주소예요 (예: <code>lunch-app.vercel.app</code>)
+          화면에 표시된 URL이 우리 앱 주소예요<br>
+          <span style="color:#666;font-size:13px;">※ URL은 Vercel이 자동 생성 — 예시: <code>office-lunch-app-abc123.vercel.app</code> (사람마다 달라요)</span>
           <div class="screenshot-box">
             <img src="screenshots/step3_vercel_success.png" alt="배포 완료"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
@@ -1297,7 +1298,7 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          Vercel에서 받은 URL 입력 (예: <span class="highlight">lunch-app.vercel.app</span>) → <span class="click-target">추가</span>
+          Vercel에서 받은 URL 입력 (예: <span class="highlight">office-lunch-app.vercel.app</span>) → <span class="click-target">추가</span>
         </div>
       </li>
     </ol>
@@ -1314,7 +1315,7 @@ const firebaseConfig = {
     <ul class="checklist">
       <li>
         <input type="checkbox" id="c3-1" onchange="saveCheck('c3-1',this.checked)">
-        <label for="c3-1">Vercel에서 lunch-app GitHub 저장소 Import</label>
+        <label for="c3-1">Vercel에서 office-lunch-app GitHub 저장소 Import</label>
       </li>
       <li>
         <input type="checkbox" id="c3-2" onchange="saveCheck('c3-2',this.checked)">
@@ -1383,7 +1384,7 @@ const firebaseConfig = {
       </div>
       <div class="code-body"><pre>안녕하세요! 점심 & 음료 신청 앱을 만들었어요 🍱☕
 
-📱 앱 주소: https://lunch-app.vercel.app
+📱 앱 주소: https://[내 Vercel URL 붙여넣기]
 
 Google 계정으로 로그인하면 바로 사용 가능합니다!
 매일 점심 전에 미리 신청해주세요.</pre></div>
