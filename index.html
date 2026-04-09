@@ -781,16 +781,32 @@ const firebaseConfig = {
       <li>
         <div class="action-text">
           AI가 코드를 작성합니다 (1~2분 대기)<br>
-          오른쪽 미리보기에 앱 화면이 나타나면 완성!
+          오른쪽 <strong>Preview 탭</strong>에 앱 화면이 나타나면 완성!
           <div class="screenshot-box">
-            <img src="screenshots/_pending_step1_gas_app_preview.png" alt="앱 미리보기"
+            <img src="screenshots/step1_gas_app_preview.png" alt="앱 미리보기"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
             <div style="display:none">
               <div class="ss-icon">✨</div>
-              <div class="ss-label">AI가 앱을 만드는 중...</div>
-              <div class="ss-desc">왼쪽 채팅에 코드가 생성되고, 오른쪽에 앱 미리보기가 나타나요.<br>메뉴 선택 폼과 신청 목록이 보이면 성공!</div>
+              <div class="ss-label">앱 미리보기 — "오늘의 점심"</div>
+              <div class="ss-desc">처음 열면 <strong>"환영합니다!" 튜토리얼 팝업</strong>이 나타나요.<br>"건너뛰기(Skip)"를 클릭하면 신청 폼이 보입니다.<br>이름 입력 + 메뉴/음료 선택 폼이 나타나면 성공!</div>
             </div>
-            <div class="ss-caption">↑ 오른쪽에 앱 미리보기가 나타나면 완성!</div>
+            <div class="ss-caption">↑ Preview 탭 클릭 → 앱이 나타나면 완성! (첫 화면에 튜토리얼 팝업 정상)</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="action-text">
+          왼쪽 채팅에서 <strong>Code 탭</strong>을 클릭하면 생성된 파일 목록도 볼 수 있어요<br>
+          <span style="color:#666;font-size:13px;">App.tsx, index.html, package.json, src/ 폴더 등이 보이면 정상 생성된 것!</span>
+          <div class="screenshot-box">
+            <img src="screenshots/step1_gas_code_tab.png" alt="코드 탭"
+                 onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div style="display:none">
+              <div class="ss-icon">💻</div>
+              <div class="ss-label">Code 탭 — 생성된 파일 목록</div>
+              <div class="ss-desc">왼쪽 위 "Code" 탭 클릭 → File explorer에 App.tsx, package.json, src/ 등이 보여요.<br>이 코드 전체가 GitHub에 저장됩니다.</div>
+            </div>
+            <div class="ss-caption">↑ Code 탭에서 생성된 파일 확인 (App.tsx, package.json, src/ 등)</div>
           </div>
         </div>
       </li>
@@ -816,24 +832,24 @@ const firebaseConfig = {
       <span class="alert-icon">🚀</span>
       <div class="alert-body">
         <strong>ZIP 다운로드 없이 바로 저장!</strong>
-        AI Studio 오른쪽 위에 GitHub 연결 버튼이 있어요. 클릭 한 번으로 코드가 GitHub에 저장됩니다.
+        AI Studio 오른쪽 위 <strong>"Sync to GitHub"</strong> 버튼 한 번으로 코드가 GitHub에 저장됩니다.
       </div>
     </div>
 
     <ol class="action-list">
       <li>
         <div class="action-text">
-          AI Studio Build 화면 <strong>오른쪽 위</strong>에서 <span class="click-target">GitHub 아이콘</span> 또는 <span class="click-target">Export to GitHub</span> 버튼 클릭
+          AI Studio 화면 <strong>오른쪽 위</strong>에서 <span class="click-target">Sync to GitHub</span> 버튼 클릭
           <div class="screenshot-box">
-            <img src="screenshots/_pending_step1_gas_github_button.png" alt="GitHub 버튼"
+            <img src="screenshots/step1_gas_github_button.png" alt="Sync to GitHub 버튼"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
             <div style="display:none">
-              <div class="ss-icon">📂</div>
-              <div class="ss-label">AI Studio 오른쪽 상단 — GitHub 버튼</div>
-              <div class="ss-desc">오른쪽 위에 GitHub 고양이 아이콘(🐙) 또는 "GitHub에 저장" 버튼이 있어요.<br>
-              찾기 어려우면 <strong>채팅창에 "GitHub에 업로드해줘"</strong> 라고 요청해도 됩니다!</div>
+              <div class="ss-icon">🐙</div>
+              <div class="ss-label">오른쪽 위 — "Sync to GitHub" 버튼</div>
+              <div class="ss-desc">상단 오른쪽에 <strong>"Sync to GitHub"</strong> 버튼이 있어요.<br>
+              보이지 않으면 채팅창에 <strong>"GitHub에 저장해줘"</strong> 라고 요청해도 됩니다!</div>
             </div>
-            <div class="ss-caption">↑ AI Studio 오른쪽 위 — GitHub 저장 버튼</div>
+            <div class="ss-caption">↑ AI Studio 오른쪽 위 — "Sync to GitHub" 버튼 클릭</div>
           </div>
         </div>
       </li>
@@ -841,7 +857,7 @@ const firebaseConfig = {
         <div class="action-text">
           처음 사용 시 → <span class="click-target">GitHub 계정 연결</span> 클릭 → GitHub 로그인 후 권한 허용
           <div class="screenshot-box">
-            <img src="screenshots/_pending_step1_gas_github_auth.png" alt="GitHub 연결 화면"
+            <img src="screenshots/step1_gas_github_auth.png" alt="GitHub 연결 화면"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
             <div style="display:none">
               <div class="ss-icon">🔗</div>
@@ -854,17 +870,18 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          저장소(Repository) 이름 입력: <span class="highlight">office-lunch-app</span> → <span class="click-target">Create and push</span> 클릭
+          저장소(Repository) 이름 입력 (예: <span class="highlight">lunch-cafe</span>) → <span class="click-target">Create and push</span> 클릭<br>
+          <span style="color:#666;font-size:13px;">이름은 자유롭게 — 영어, 소문자, 하이픈만 사용 (예: my-lunch-app, office-menu)</span>
           <div class="screenshot-box">
-            <img src="screenshots/_pending_step1_gas_repo_name.png" alt="저장소 이름 입력"
+            <img src="screenshots/step1_gas_repo_name.png" alt="저장소 이름 입력"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
             <div style="display:none">
               <div class="ss-icon">📝</div>
-              <div class="ss-label">새 저장소 이름 입력</div>
-              <div class="ss-desc">저장소 이름을 영어로 입력하고 "Create and push" 버튼을 클릭하세요.<br>
-              잠깐 기다리면 코드가 GitHub에 저장됩니다!</div>
+              <div class="ss-label">저장소 이름 입력 → Create and push</div>
+              <div class="ss-desc">이름을 입력하고 "Create and push"를 클릭하면<br>
+              GitHub에 <strong>내 계정명/저장소이름</strong>으로 저장됩니다 (예: Demian-Yim/lunch-cafe on main)</div>
             </div>
-            <div class="ss-caption">↑ "office-lunch-app" 입력 → Create and push 클릭</div>
+            <div class="ss-caption">↑ 저장소 이름 입력 → Create and push 클릭</div>
           </div>
         </div>
       </li>
@@ -872,7 +889,7 @@ const firebaseConfig = {
 
     <div class="success-check">
       <h4>✅ 성공 확인</h4>
-      <p>GitHub에서 <strong>office-lunch-app</strong> 저장소가 생기고, <code>package.json</code>, <code>src/</code> 등이 보이면 완성!</p>
+      <p>GitHub에서 <strong>내 계정명/저장소이름 (on main)</strong> 저장소가 생기고, <code>App.tsx</code>, <code>package.json</code>, <code>src/</code> 등이 보이면 완성!</p>
     </div>
   </div>
 
@@ -957,7 +974,7 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          프로젝트 이름 입력: <span class="highlight">office-lunch-app</span><br>
+          프로젝트 이름 입력: <span class="highlight">lunch-cafe</span><br>
           <span style="color:#666;font-size:14px;">영어 소문자와 하이픈만 사용 가능해요</span>
         </div>
       </li>
@@ -1100,9 +1117,9 @@ const firebaseConfig = {
             </div>
             <div class="code-body"><pre>const firebaseConfig = {
   apiKey: "AIzaSy...",
-  authDomain: "office-lunch-app.firebaseapp.com",
-  projectId: "office-lunch-app",
-  storageBucket: "office-lunch-app.appspot.com",
+  authDomain: "lunch-cafe.firebaseapp.com",
+  projectId: "lunch-cafe",
+  storageBucket: "lunch-cafe.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123:web:abc..."
 };</pre></div>
@@ -1213,17 +1230,17 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          GitHub 저장소 목록에서 <span class="highlight">office-lunch-app</span> 찾기 → <span class="click-target">Import</span> 클릭
+          GitHub 저장소 목록에서 <span class="highlight">lunch-cafe</span> 찾기 → <span class="click-target">Import</span> 클릭
           <div class="screenshot-box">
             <img src="screenshots/step3_vercel_import_repo.png" alt="Vercel 저장소 선택"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
             <div style="display:none">
               <div class="ss-icon">📂</div>
-              <div class="ss-label">저장소 목록에서 office-lunch-app 선택</div>
-              <div class="ss-desc">Step 1에서 만든 "office-lunch-app" 저장소가 목록에 보여요.<br>
+              <div class="ss-label">저장소 목록에서 lunch-cafe 선택</div>
+              <div class="ss-desc">Step 1에서 만든 "lunch-cafe" 저장소가 목록에 보여요.<br>
               옆에 있는 <strong>"Import"</strong> 버튼을 클릭하세요.</div>
             </div>
-            <div class="ss-caption">↑ 저장소 목록에서 office-lunch-app → Import 클릭</div>
+            <div class="ss-caption">↑ 저장소 목록에서 lunch-cafe → Import 클릭</div>
           </div>
         </div>
       </li>
@@ -1243,7 +1260,7 @@ const firebaseConfig = {
         <div class="action-text">
           1~2분 기다리면 "Congratulations! 🎉" 화면이 나타납니다<br>
           화면에 표시된 URL이 우리 앱 주소예요<br>
-          <span style="color:#666;font-size:13px;">※ URL은 Vercel이 자동 생성 — 예시: <code>office-lunch-app-abc123.vercel.app</code> (사람마다 달라요)</span>
+          <span style="color:#666;font-size:13px;">※ URL은 Vercel이 자동 생성 — 예시: <code>lunch-cafe-abc123.vercel.app</code> (사람마다 달라요)</span>
           <div class="screenshot-box">
             <img src="screenshots/step3_vercel_success.png" alt="배포 완료"
                  onerror="this.parentElement.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='block'">
@@ -1298,7 +1315,7 @@ const firebaseConfig = {
       </li>
       <li>
         <div class="action-text">
-          Vercel에서 받은 URL 입력 (예: <span class="highlight">office-lunch-app.vercel.app</span>) → <span class="click-target">추가</span>
+          Vercel에서 받은 URL 입력 (예: <span class="highlight">lunch-cafe.vercel.app</span>) → <span class="click-target">추가</span>
         </div>
       </li>
     </ol>
@@ -1315,7 +1332,7 @@ const firebaseConfig = {
     <ul class="checklist">
       <li>
         <input type="checkbox" id="c3-1" onchange="saveCheck('c3-1',this.checked)">
-        <label for="c3-1">Vercel에서 office-lunch-app GitHub 저장소 Import</label>
+        <label for="c3-1">Vercel에서 lunch-cafe GitHub 저장소 Import</label>
       </li>
       <li>
         <input type="checkbox" id="c3-2" onchange="saveCheck('c3-2',this.checked)">
